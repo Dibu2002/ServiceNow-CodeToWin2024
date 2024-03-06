@@ -99,40 +99,48 @@ class TrafficLane:
         self.calculate_priority()
 
         # Create labels for lane name, signal light color, vehicle counts, total units, and time remaining
-        self.label_lane = tk.Label(master, text="Lane " + str(lane))
+        self.label_lane = tk.Label(master, text="Lane " + str(lane),font=("Helvetica", 16))
         self.label_lane.pack()
 
         self.label_signal = tk.Label(master, width=10, height=2)  # Set appropriate width and height
         self.label_signal.pack()
 
-        self.label_motorcycles = tk.Label(master, text="Motorcycles: " + str(self.motorcycle_count))
+        self.label_motorcycles = tk.Label(master, text="Motorcycles: " + str(self.motorcycle_count), font=("Helvetica", 12))
         self.label_motorcycles.pack()
 
-        self.label_cars = tk.Label(master, text="Cars: " + str(self.car_count))
+        self.label_cars = tk.Label(master, text="Cars: " + str(self.car_count), font=("Helvetica", 12))
         self.label_cars.pack()
 
-        self.label_buses = tk.Label(master, text="Buses: " + str(self.bus_count))
+        self.label_buses = tk.Label(master, text="Buses: " + str(self.bus_count), font=("Helvetica", 12))
         self.label_buses.pack()
 
-        self.label_trucks = tk.Label(master, text="Trucks: " + str(self.truck_count))
+        self.label_trucks = tk.Label(master, text="Trucks: " + str(self.truck_count), font=("Helvetica", 12))
         self.label_trucks.pack()
 
-        self.label_total_units = tk.Label(master, text="Total Units: ")
+        self.label_total_units = tk.Label(master, text="Total Units: ", font=("Helvetica", 12))
         self.label_total_units.pack()
 
-        self.label_time_remaining = tk.Label(master, text="Time Remaining: ")
+        self.label_time_remaining = tk.Label(master, text="Time Remaining: ", font=("Helvetica", 14))
         self.label_time_remaining.pack()
+
+        self.label_priority = tk.Label(master, text="Priority: ", font=("Helvetica", 14))
+        self.label_priority.pack()
+
+        self.label_priority_explain = tk.Label(master, text="", font=("Helvetica", 10))
+        self.label_priority_explain.pack()
+
+
 
     def calculate_priority(self):
         self.priority = 0.3*self.estimated_green_time + 0.7*self.waiting_time + 1000*self.important_vehicle_present
 
     def update_red_light(self, other_lane_green_time):
-        self.estimated_green_time = int(total_units_count(motorcycle[self.lane_id], car[self.lane_id], bus[self.lane_id], truck[self.lane_id]) * 0.05)
+        self.estimated_green_time = int(total_units_count(motorcycle[self.lane_id], car[self.lane_id], bus[self.lane_id], truck[self.lane_id]) * 0.02)
         self.waiting_time += other_lane_green_time
 
     def grant_green_light(self):
         self.current_time_left = self.estimated_green_time
-        self.estimated_green_time = int(total_units_count(motorcycle[self.lane_id], car[self.lane_id], bus[self.lane_id], truck[self.lane_id]) * 0.05)
+        self.estimated_green_time = int(total_units_count(motorcycle[self.lane_id], car[self.lane_id], bus[self.lane_id], truck[self.lane_id]) * 0.02)
         self.current_light_state = True
 
 global active_lane, highest_priority_lane     # Initially set to Lane 1
@@ -142,18 +150,18 @@ global next_active_lane,next_green_time
 global motorcycle, car, bus, truck
 global total_units
 
-motorcycle = [0,15,29,18,21]
-car = [0,12,7,10,11]
+motorcycle = [0,12,8,10,7]
+car = [0,15,7,10,9]
 bus = [0,1,3,2,2]
 truck = [0,2,1,2,3]
 total_units = [0,0,0,0,0]
 
 root = tk.Tk()
 
-app1 = TrafficLane(root, motorcycle[1], car[1], bus[1], truck[1], lane=1, estimated_green_time=int(total_units_count(motorcycle[1], car[1], bus[1], truck[1]) * 0.18))
-app2 = TrafficLane(tk.Toplevel(root),motorcycle[2], car[2], bus[2], truck[2], lane=2, estimated_green_time = int(total_units_count(motorcycle[2], car[2], bus[2], truck[2]) * 0.05))
-app3 = TrafficLane(tk.Toplevel(root),motorcycle[3], car[3], bus[3], truck[3], lane=3, estimated_green_time=int(total_units_count(motorcycle[3], car[3], bus[3], truck[3]) * 0.05))
-app4 = TrafficLane(tk.Toplevel(root), motorcycle[4], car[4], bus[4], truck[4], lane=4, estimated_green_time=int(total_units_count(motorcycle[4], car[4], bus[4], truck[4]) * 0.05))
+app1 = TrafficLane(root, motorcycle[1], car[1], bus[1], truck[1], lane=1, estimated_green_time=int(total_units_count(motorcycle[1], car[1], bus[1], truck[1]) * 0.25))
+app2 = TrafficLane(tk.Toplevel(root),motorcycle[2], car[2], bus[2], truck[2], lane=2, estimated_green_time = int(total_units_count(motorcycle[2], car[2], bus[2], truck[2]) * 0.02))
+app3 = TrafficLane(tk.Toplevel(root),motorcycle[3], car[3], bus[3], truck[3], lane=3, estimated_green_time=int(total_units_count(motorcycle[3], car[3], bus[3], truck[3]) * 0.02))
+app4 = TrafficLane(tk.Toplevel(root), motorcycle[4], car[4], bus[4], truck[4], lane=4, estimated_green_time=int(total_units_count(motorcycle[4], car[4], bus[4], truck[4]) * 0.02))
 
 lanes = [app1, app2, app3, app4]
 priority_queue = PriorityQueue()
@@ -237,8 +245,10 @@ def appStart():
         app.label_buses.config(text="Buses: " + str(bus[lane]))
         app.label_trucks.config(text="Trucks: " + str(truck[lane]))
         app.label_total_units.config(text="Total Units: " + str(total_units[lane]))
+        app.label_priority.config(text="Lane Priority: " + str(int(app.priority)))
 
         if lane == active_lane:
+            app.label_priority_explain.config(text="Prioritised based on estimated green time, waiting time & presence of emergency vehicles")
             if(green_time_current == 5):
                 put_all_in_queue(green_time_val, active_lane)
                 get_active_lane()
