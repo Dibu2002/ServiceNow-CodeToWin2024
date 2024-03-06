@@ -63,10 +63,8 @@ class VehicleCounterApp:
 
 def detect(save_img=False):
     global motorcycle_count,car_count,bus_count,truck_count
-
-
-    root = tk.Tk()
-    app = VehicleCounterApp(root,motorcycle_count,car_count,bus_count,truck_count)
+    # root = tk.Tk()
+    # app = VehicleCounterApp(root,motorcycle_count,car_count,bus_count,truck_count)
     source, weights, view_img, save_txt, imgsz, trace = opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size, not opt.no_trace
     save_img = not opt.nosave and not source.endswith('.txt')  # save inference images
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
@@ -119,6 +117,10 @@ def detect(save_img=False):
 
     t0 = time.time()
     for path, img, im0s, vid_cap in dataset:
+        car_count = 0
+        bus_count = 0
+        motorcycle_count = 0
+        truck_count = 0
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
@@ -169,6 +171,7 @@ def detect(save_img=False):
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
                 # Write results
+               
                 for *xyxy, conf, cls in reversed(det):
                     if save_txt:  # Write to file
                         xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
@@ -177,15 +180,15 @@ def detect(save_img=False):
                             f.write(('%g ' * len(line)).rstrip() % line + '\n')
                     
                     if save_img or view_img:  # Add bbox to image
-                        if names[int(cls)]=='car':
+                        if names[int(cls)]=='car' or names[int(cls)]=='taxi' or names[int(cls)]=='three wheelers -CNG-' or names[int(cls)]=='van' or names[int(cls)]=='minibus' or names[int(cls)]=='minivan' or names[int(cls)]=='suv':
                             car_count += 1
                         if names[int(cls)]=='bus':
                             bus_count += 1
-                        if names[int(cls)]=='motorcycle':
+                        if names[int(cls)]=='motorbike' or names[int(cls)]=='scooter':
                             motorcycle_count += 1
                         if names[int(cls)]=='truck':
                             truck_count += 1
-                        if names[int(cls)]=='ambulance':
+                        if names[int(cls)]=='ambulance' or names[int(cls)]=='army vehicle' or names[int(cls)]=='policecar':
                             flag = True
                         label = f'{names[int(cls)]} {conf:.2f}'
                         plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=1)
@@ -196,9 +199,9 @@ def detect(save_img=False):
             # height, width, _ = im0.shape
 
             x_coordinate = 10
-            y_coordinate = 35
+            y_coordinate = 222
             # Define the top-left and bottom-right points of the rectangle
-            top_left = (10, 10)
+            top_left = (10, 200)
             bottom_right = (top_left[0] + 150, top_left[1] + 150)
 
             # Draw the rectangle on the image
@@ -256,7 +259,7 @@ def detect(save_img=False):
 
             cv2.putText(
                 image,                              # Image to draw the text on
-                f'Imp vehicle: {flag}',            # Text to display
+                f'Flag: {flag}',            # Text to display
                 (x_coordinate, y_coordinate+120),                # Coordinates where the text will start (top-left corner)
                 font,         # Font Hershey complex type
                 scale,                                # Font scale (size)
