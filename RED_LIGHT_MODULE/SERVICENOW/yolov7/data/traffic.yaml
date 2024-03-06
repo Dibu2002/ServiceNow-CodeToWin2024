@@ -1,0 +1,9 @@
+train: traffic_dataset/images/train
+val: traffic_dataset/images/valid
+test: traffic_dataset/images/test
+
+# Classes
+nc: 21  # number of classes
+names: ['ambulance', 'army vehicle', 'auto rickshaw', 'bicycle', 'bus', 'car', 'garbagevan', 
+'human hauler', 'minibus', 'minivan', 'motorbike', 'pickup', 'policecar', 'rickshaw', 'scooter', 'suv',
+ 'taxi', 'three wheelers -CNG-', 'truck', 'van', 'wheelbarrow']
